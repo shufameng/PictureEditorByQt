@@ -6,6 +6,8 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsEllipseItem>
+#include <QGraphicsLineItem>
+#include <QGraphicsPathItem>
 
 class PEGraphicsScene : public QGraphicsScene
 {
@@ -14,10 +16,14 @@ class PEGraphicsScene : public QGraphicsScene
 public:
     PEGraphicsScene(QObject *parent = 0);
 
-    enum SceneMode {
-        NORMAL_MODE = 0,
-        ADD_RECT_MODE,
-        ADD_ELLIPSE_MODE
+    enum Shape {
+        NoShape = 0,
+        Shape_HorLine,
+        Shape_VerLine,
+        Shape_Line,
+        Shape_Rect,
+        Shape_Ellipse,
+        Shape_Path
     };
 
 protected:
@@ -25,17 +31,29 @@ protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
-    QRectF getDirectionalRect(const QPointF &startPos, const QPointF &endPos);
-
 public:
+    static QRectF getDirectionalRect(const QPointF &startPos, const QPointF &endPos);
+    static QLineF getHorizontalLine(const QPointF &startPos, const QPointF &endPos);
+    static QLineF getVerticalLine(const QPointF &startPos, const QPointF &endPos);
+
+public slots:
     bool openFile(const QString &filePath);
+    void setPenWidth(const int w)                   { mPen.setWidth(w); }
+    void setPenColor(const QColor &color)       { mPen.setColor(color); }
+    QPen pen()                                                  { return mPen; }
+    void setBrushColor(const QColor &color)     { mBrush.setColor(color); }
+    QBrush brush()                                          { return mBrush; }
+    Shape sceneMode()                           { return mSceneMode; }
+    void setSceneMode(Shape mode)       { mSceneMode = mode; }
 
 private:
-    SceneMode       mSceneMode;
+    Shape       mSceneMode;
 
-    QPointF                         mAddItemPoint;
+    QPointF                         mLButtonPressPos;
+    QGraphicsLineItem       *mCurLineItem;
     QGraphicsRectItem       *mCurRectItem;
     QGraphicsEllipseItem    *mCurEllipseItem;
+    QGraphicsPathItem       *mCurPathItem;
     QPen                                mPen;
     QBrush                          mBrush;
     QGraphicsPixmapItem     *mBackgroundItem;

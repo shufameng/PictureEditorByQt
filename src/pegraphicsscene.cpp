@@ -5,41 +5,55 @@
 PEGraphicsScene::PEGraphicsScene(QObject *parent) :
     QGraphicsScene(parent)
 {
-    mSceneMode = ADD_ELLIPSE_MODE;
-
+    mSceneMode = NoShape;
+    mCurLineItem = NULL;
     mCurRectItem = NULL;
     mCurEllipseItem = NULL;
+    mCurPathItem = NULL;
     mBackgroundItem = NULL;
 }
 
 void PEGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << "PEGraphicsScene::mousePressEvent" << event->scenePos();
-    qDebug() << "item count:" << items().size();
-
     if (Qt::LeftButton != event->button())
+        return;
+    if (!mBackgroundItem)
         return;
 
     switch (mSceneMode) {
-    case NORMAL_MODE:
+    case NoShape:
+        break;
 
+    case Shape_HorLine:
+    case Shape_VerLine:
+    case Shape_Line:
+        mLButtonPressPos = event->scenePos();
+        mCurLineItem = addLine(QLineF(event->scenePos(), event->scenePos()), mPen);
+        mCurLineItem->setParentItem(mBackgroundItem);
         break;
-    case ADD_RECT_MODE:
+
+    case Shape_Rect:
+        mLButtonPressPos = event->scenePos();
+        mCurRectItem = addRect(QRectF(event->scenePos(), event->scenePos()), mPen, mBrush);
+        mCurRectItem->setParentItem(mBackgroundItem);
+        break;
+
+    case Shape_Ellipse:
+        mLButtonPressPos = event->scenePos();
+        mCurEllipseItem = addEllipse(QRectF(event->scenePos(), event->scenePos()), mPen, mBrush);
+        mCurEllipseItem->setParentItem(mBackgroundItem);
+        break;
+
+    case Shape_Path:
     {
-        mAddItemPoint = event->scenePos();
-        QRectF r(event->scenePos(), event->scenePos());
-        mCurRectItem = new QGraphicsRectItem(mBackgroundItem);
-        mCurRectItem->setRect(r);
+        mCurPathItem = new QGraphicsPathItem;
+        mCurPathItem->setPen(mPen);
+        mCurPathItem->setBrush(mBrush);
+        mCurPathItem->setPath(QPainterPath(event->scenePos()));
+        mCurPathItem->setParentItem(mBackgroundItem);
     }
         break;
-    case ADD_ELLIPSE_MODE:
-    {
-        mAddItemPoint = event->scenePos();
-        QRectF r(event->scenePos(), event->scenePos());
-        mCurEllipseItem = new QGraphicsEllipseItem(mBackgroundItem);
-        mCurEllipseItem->setRect(r);
-    }
-        break;
+
     default:
         break;
     }
@@ -47,27 +61,38 @@ void PEGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void PEGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << "PEGraphicsScene::mouseMoveEvent";
-
     switch (mSceneMode) {
-    case NORMAL_MODE:
-    {
-        qDebug() << "MORMAL_MODE";
-    }
+    case NoShape:
+        break;
 
+    case Shape_HorLine:
+        mCurLineItem->setLine(getHorizontalLine(mLButtonPressPos, event->scenePos()));
         break;
-    case ADD_RECT_MODE:
+
+    case Shape_VerLine:
+        mCurLineItem->setLine(getVerticalLine(mLButtonPressPos, event->scenePos()));
+        break;
+
+    case Shape_Line:
+        mCurLineItem->setLine(QLineF(mLButtonPressPos, event->scenePos()));
+        break;
+
+    case Shape_Rect:
+        mCurRectItem->setRect(getDirectionalRect(mLButtonPressPos, event->scenePos()));
+        break;
+
+    case Shape_Ellipse:
+        mCurEllipseItem->setRect(getDirectionalRect(mLButtonPressPos, event->scenePos()));
+        break;
+
+    case Shape_Path:
     {
-        QRectF r = getDirectionalRect(mAddItemPoint, event->scenePos());
-        mCurRectItem->setRect(r);
+        QPainterPath path = mCurPathItem->path();
+        path.lineTo(event->scenePos());
+        mCurPathItem->setPath(path);
     }
         break;
-    case ADD_ELLIPSE_MODE:
-    {
-        QRectF r = getDirectionalRect(mAddItemPoint, event->scenePos());
-        mCurEllipseItem->setRect(r);
-    }
-        break;
+
     default:
         break;
     }
@@ -75,8 +100,6 @@ void PEGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void PEGraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << "PEGraphicsScene::mouseReleaseEvent";
-
     if (Qt::LeftButton != event->button())
         return;
 }
@@ -108,6 +131,22 @@ QRectF PEGraphicsScene::getDirectionalRect(const QPointF &startPos, const QPoint
     }
 
     return r;
+}
+
+QLineF PEGraphicsScene::getHorizontalLine(const QPointF &startPos, const QPointF &endPos)
+{
+    QLineF line;
+    line.setP1(startPos);
+    line.setP2(QPointF(endPos.x(), startPos.y()));
+    return line;
+}
+
+QLineF PEGraphicsScene::getVerticalLine(const QPointF &startPos, const QPointF &endPos)
+{
+    QLineF line;
+    line.setP1(startPos);
+    line.setP2(QPointF(startPos.x(), endPos.y()));
+    return line;
 }
 
 bool PEGraphicsScene::openFile(const QString &filePath)

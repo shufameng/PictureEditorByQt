@@ -10,6 +10,7 @@ class PEMainWindow;
 
 class PEGraphicsScene;
 class PEGraphicsView;
+class CtrlSceneDialog;
 
 class PEMainWindow : public QMainWindow
 {
@@ -28,6 +29,7 @@ private:
     PEGraphicsScene     *mScene;
     PEGraphicsView      *mView;
 
+    CtrlSceneDialog           *mCtrlDialog;
 };
 
 #endif // PEMAINWINDOW_H

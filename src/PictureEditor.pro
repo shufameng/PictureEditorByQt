@@ -15,10 +15,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
         pemainwindow.cpp \
     pegraphicsscene.cpp \
-    pegraphicsview.cpp
+    pegraphicsview.cpp \
+    ctrlscenedialog.cpp
 
 HEADERS  += pemainwindow.h \
     pegraphicsscene.h \
-    pegraphicsview.h
+    pegraphicsview.h \
+    ctrlscenedialog.h
 
-FORMS    += pemainwindow.ui
+FORMS    += pemainwindow.ui \
+    ctrlscenedialog.ui
