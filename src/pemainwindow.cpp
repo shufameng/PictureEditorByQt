@@ -4,6 +4,7 @@
 #include "pegraphicsscene.h"
 #include "pegraphicsview.h"
 #include "ctrlscenedialog.h"
+#include "ctrlviewdialog.h"
 
 #include <QHBoxLayout>
 #include <QFileDialog>
@@ -23,15 +24,19 @@ PEMainWindow::PEMainWindow(QWidget *parent) :
     hLay->addWidget(mView);
     mView->setScene(mScene = new PEGraphicsScene);
 
-    // controller dialog
-    mCtrlDialog = new CtrlSceneDialog;
-    mCtrlDialog->setScene(mScene);
+    // scene controller
+    mCtrlSceneDialog = new CtrlSceneDialog;
+    mCtrlSceneDialog->setScene(mScene);
     QDockWidget *sceneCtrllerDock = new QDockWidget("Scene Contorller");
-    sceneCtrllerDock->setWidget(mCtrlDialog);
+    sceneCtrllerDock->setWidget(mCtrlSceneDialog);
     addDockWidget(Qt::LeftDockWidgetArea, sceneCtrllerDock);
     ui->menuView->addAction(sceneCtrllerDock->toggleViewAction());
 
+    // view controller
+    mCtrlViewDialog = new CtrlViewDialog;
+    mCtrlViewDialog->setView(mView);
     QDockWidget *viewCtrllerDock = new QDockWidget("View Controller");
+    viewCtrllerDock->setWidget(mCtrlViewDialog);
     addDockWidget(Qt::LeftDockWidgetArea, viewCtrllerDock);
     ui->menuView->addAction(viewCtrllerDock->toggleViewAction());
 }

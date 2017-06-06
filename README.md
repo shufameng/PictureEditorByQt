@@ -1,2 +1,2 @@
 # PictureEditorByQt
-a simple piture editor, by qt 5.5.1
+A simple picture editor developed by Qt5.5.1.

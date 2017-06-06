@@ -16,12 +16,15 @@ SOURCES += main.cpp\
         pemainwindow.cpp \
     pegraphicsscene.cpp \
     pegraphicsview.cpp \
-    ctrlscenedialog.cpp
+    ctrlscenedialog.cpp \
+    ctrlviewdialog.cpp
 
 HEADERS  += pemainwindow.h \
     pegraphicsscene.h \
     pegraphicsview.h \
-    ctrlscenedialog.h
+    ctrlscenedialog.h \
+    ctrlviewdialog.h
 
 FORMS    += pemainwindow.ui \
-    ctrlscenedialog.ui
+    ctrlscenedialog.ui \
+    ctrlviewdialog.ui
