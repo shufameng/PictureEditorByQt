@@ -5,7 +5,7 @@
 PEGraphicsScene::PEGraphicsScene(QObject *parent) :
     QGraphicsScene(parent)
 {
-    mSceneMode = NoShape;
+    mToolShape = NoShape;
     mCurLineItem = NULL;
     mCurRectItem = NULL;
     mCurEllipseItem = NULL;
@@ -20,7 +20,7 @@ void PEGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (!mBackgroundItem)
         return;
 
-    switch (mSceneMode) {
+    switch (mToolShape) {
     case NoShape:
         break;
 
@@ -61,7 +61,7 @@ void PEGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void PEGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    switch (mSceneMode) {
+    switch (mToolShape) {
     case NoShape:
         break;
 
@@ -78,11 +78,11 @@ void PEGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         break;
 
     case Shape_Rect:
-        mCurRectItem->setRect(getDirectionalRect(mLButtonPressPos, event->scenePos()));
+        mCurRectItem->setRect(getRectByPoints(mLButtonPressPos, event->scenePos()));
         break;
 
     case Shape_Ellipse:
-        mCurEllipseItem->setRect(getDirectionalRect(mLButtonPressPos, event->scenePos()));
+        mCurEllipseItem->setRect(getRectByPoints(mLButtonPressPos, event->scenePos()));
         break;
 
     case Shape_Path:
@@ -104,29 +104,29 @@ void PEGraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         return;
 }
 
-QRectF PEGraphicsScene::getDirectionalRect(const QPointF &startPos, const QPointF &endPos)
+QRectF PEGraphicsScene::getRectByPoints(const QPointF &p1, const QPointF &p2)
 {
     QRectF r;
 
-    if ((endPos.x() >= startPos.x()) && (endPos.y() >= startPos.y())) {
-        r.setTopLeft(startPos);
-        r.setBottomRight(endPos);
+    if ((p2.x() >= p1.x()) && (p2.y() >= p1.y())) {
+        r.setTopLeft(p1);
+        r.setBottomRight(p2);
 
-    } else if ((endPos.x() < startPos.x()) && (endPos.y() < startPos.y())) {
-        r.setTopLeft(endPos);
-        r.setBottomRight(startPos);
+    } else if ((p2.x() < p1.x()) && (p2.y() < p1.y())) {
+        r.setTopLeft(p2);
+        r.setBottomRight(p1);
 
-    } else if ((endPos.x() >= startPos.x()) && (endPos.y() < startPos.y())) {
-        r.setLeft(startPos.x());
-        r.setRight(endPos.x());
-        r.setTop(endPos.y());
-        r.setBottom(startPos.y());
+    } else if ((p2.x() >= p1.x()) && (p2.y() < p1.y())) {
+        r.setLeft(p1.x());
+        r.setRight(p2.x());
+        r.setTop(p2.y());
+        r.setBottom(p1.y());
 
-    } else if ((endPos.x() < startPos.x()) && (endPos.y() >= startPos.y())) {
-        r.setLeft(endPos.x());
-        r.setRight(startPos.x());
-        r.setTop(startPos.y());
-        r.setBottom(endPos.y());
+    } else if ((p2.x() < p1.x()) && (p2.y() >= p1.y())) {
+        r.setLeft(p2.x());
+        r.setRight(p1.x());
+        r.setTop(p1.y());
+        r.setBottom(p2.y());
 
     }
 

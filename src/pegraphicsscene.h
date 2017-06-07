@@ -16,7 +16,7 @@ class PEGraphicsScene : public QGraphicsScene
 public:
     PEGraphicsScene(QObject *parent = 0);
 
-    enum Shape {
+    enum ToolShape {
         NoShape = 0,
         Shape_HorLine,
         Shape_VerLine,
@@ -32,7 +32,7 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 public:
-    static QRectF getDirectionalRect(const QPointF &startPos, const QPointF &endPos);
+    static QRectF getRectByPoints(const QPointF &p1, const QPointF &p2);
     static QLineF getHorizontalLine(const QPointF &startPos, const QPointF &endPos);
     static QLineF getVerticalLine(const QPointF &startPos, const QPointF &endPos);
 
@@ -43,11 +43,11 @@ public slots:
     QPen pen()                                                  { return mPen; }
     void setBrushColor(const QColor &color)     { mBrush.setColor(color); }
     QBrush brush()                                          { return mBrush; }
-    Shape sceneMode()                           { return mSceneMode; }
-    void setSceneMode(Shape mode)       { mSceneMode = mode; }
+    ToolShape toolShape()                           { return mToolShape; }
+    void setToolShape(ToolShape shape)       { mToolShape = shape; }
 
 private:
-    Shape       mSceneMode;
+     ToolShape       mToolShape;
 
     QPointF                         mLButtonPressPos;
     QGraphicsLineItem       *mCurLineItem;

@@ -1,6 +1,7 @@
 #include "pegraphicsview.h"
 #include <QDebug>
 #include <QScrollBar>
+#include "pegraphicsscene.h"
 
 PEGraphicsView::PEGraphicsView(QWidget *parent) :
     QGraphicsView(parent)
@@ -17,6 +18,8 @@ void PEGraphicsView::mousePressEvent(QMouseEvent *event)
 
     if (event->button() == Qt::LeftButton) {
         mLButtonPressPos = event->pos();
+        mLButtonPressPosAtScene = mapToScene(event->pos());
+        mViewCenterAtScene = mapToScene(viewport()->rect().center());
     }
 }
 
@@ -28,10 +31,11 @@ void PEGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 void PEGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseMoveEvent(event);
+    QPointF eventPosAtScene = mapToScene(event->pos());
+    QPointF point = eventPosAtScene - mLButtonPressPosAtScene;
+    centerOn(mViewCenterAtScene - point);
 
-    QPointF p = mLButtonPressPos - event->pos();
-    horizontalScrollBar()->setValue(horizontalScrollBar()->value() + p.x());
-    verticalScrollBar()->setValue(verticalScrollBar()->value() + p.y());
+    qDebug() << eventPosAtScene;
 }
 
 void PEGraphicsView::wheelEvent(QWheelEvent *event)
@@ -48,10 +52,17 @@ void PEGraphicsView::onScorllBarRangeChanged(int min, int max)
     Q_UNUSED(min);
     Q_UNUSED(max);
 
-    if (horizontalScrollBar()->maximum() <= 0 && verticalScrollBar()->maximum() <= 0) {
-        setCursor(QCursor(Qt::ArrowCursor));
-    } else {
-        setCursor(QCursor(Qt::OpenHandCursor));
+    PEGraphicsScene *pScene = dynamic_cast<PEGraphicsScene*>(scene());
+    if (pScene) {
+        if (PEGraphicsScene::NoShape == pScene->toolShape()) {
+            if (horizontalScrollBar()->maximum() <= 0 && verticalScrollBar()->maximum() <= 0) {
+                setCursor(QCursor(Qt::ArrowCursor));
+            } else {
+                setCursor(QCursor(Qt::OpenHandCursor));
+            }
+        } else {
+            setCursor(QCursor(Qt::ArrowCursor));
+        }
     }
 }
 

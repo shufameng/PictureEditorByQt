@@ -40,7 +40,7 @@ void CtrlSceneDialog::setScene(PEGraphicsScene *scene)
         // brush color
         ui->toolButton_brushColor->setIcon(getColorIcon(mScene->brush().color()));
         // shape
-        ui->comboBox_shape->setCurrentIndex((int)mScene->sceneMode());
+        ui->comboBox_shape->setCurrentIndex((int)mScene->toolShape());
     }
 }
 
@@ -73,6 +73,6 @@ void CtrlSceneDialog::on_toolButton_brushColor_clicked()
 void CtrlSceneDialog::on_comboBox_shape_currentIndexChanged(int index)
 {
     if (mScene) {
-        mScene->setSceneMode((PEGraphicsScene::Shape)index);
+        mScene->setToolShape((PEGraphicsScene:: ToolShape)index);
     }
 }

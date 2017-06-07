@@ -31,6 +31,8 @@ public slots:
 
 private:
     QPointF mLButtonPressPos;
+    QPointF mLButtonPressPosAtScene;
+    QPointF mViewCenterAtScene;
 };
 
 #endif // PEGRAPHICSVIEW_H
