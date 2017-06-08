@@ -4,7 +4,8 @@
 #include "pegraphicsscene.h"
 
 PEGraphicsView::PEGraphicsView(QWidget *parent) :
-    QGraphicsView(parent)
+    QGraphicsView(parent),
+    mZoomRate(1.0)
 {
     connect(horizontalScrollBar(), SIGNAL(rangeChanged(int,int)),
             this, SLOT(onScorllBarRangeChanged(int,int)));
@@ -18,7 +19,6 @@ void PEGraphicsView::mousePressEvent(QMouseEvent *event)
 
     if (event->button() == Qt::LeftButton) {
         mLButtonPressPos = event->pos();
-        mLButtonPressPosAtScene = mapToScene(event->pos());
         mViewCenterAtScene = mapToScene(viewport()->rect().center());
     }
 }
@@ -31,11 +31,8 @@ void PEGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 void PEGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseMoveEvent(event);
-    QPointF eventPosAtScene = mapToScene(event->pos());
-    QPointF point = eventPosAtScene - mLButtonPressPosAtScene;
-    centerOn(mViewCenterAtScene - point);
-
-    qDebug() << eventPosAtScene;
+    QPointF point = event->pos() - mLButtonPressPos;
+    centerOn(mViewCenterAtScene - point/mZoomRate);
 }
 
 void PEGraphicsView::wheelEvent(QWheelEvent *event)
@@ -68,17 +65,22 @@ void PEGraphicsView::onScorllBarRangeChanged(int min, int max)
 
 void PEGraphicsView::zoomIn()
 {
-    scale(1.1, 1.1);
+    qreal rate = 1.1;
+    scale(rate, rate);
+    mZoomRate *= rate;
 }
 
 void PEGraphicsView::zoomOut()
 {
-    scale(0.9, 0.9);
+    qreal rate = 1.0/1.1;
+    scale(rate, rate);
+    mZoomRate *= rate;
 }
 
 void PEGraphicsView::showOriginalSize()
 {
     resetMatrix();
+    mZoomRate = 1.0;
 }
 
 void PEGraphicsView::showFitViewSize()
@@ -93,6 +95,8 @@ void PEGraphicsView::showFitViewSize()
         resetMatrix();
         scale(viewSize.width() / sceneSize.width(), viewSize.width() / sceneSize.width());
     }
+
+    mZoomRate = viewSize.width() / sceneSize.width();
 }
 
 void PEGraphicsView::rotate90Clockwise()
@@ -108,5 +112,13 @@ void PEGraphicsView::rotate90AntiClockwise()
 void PEGraphicsView::rotate180()
 {
     rotate(180);
+}
+
+QSize PEGraphicsView::getViewEntireSize()
+{
+    QSize s = viewport()->size();
+    s.setWidth(s.width() + horizontalScrollBar()->maximum());
+    s.setHeight(s.height() + verticalScrollBar()->maximum());
+    return s;
 }
 

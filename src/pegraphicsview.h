@@ -29,10 +29,13 @@ public slots:
     void rotate90AntiClockwise();
     void rotate180();
 
+    QSize getViewEntireSize();
+
 private:
     QPointF mLButtonPressPos;
-    QPointF mLButtonPressPosAtScene;
     QPointF mViewCenterAtScene;
+
+    double  mZoomRate;
 };
 
 #endif // PEGRAPHICSVIEW_H
